@@ -441,7 +441,7 @@ class Cassandra
         {
             // ERROR: <int code><string msg>
             $errCode = self::int_from_bin($body, 0, 4);
-            $errMsg = self::pop_string(substr($body, 4));
+            $errMsg = self::pop_string($body, 4);
 
             trigger_error('Error 0x'.sprintf('%04X', $errCode).
                 ' received from server: '.$errMsg);
@@ -465,21 +465,22 @@ class Cassandra
     private static function parse_result($body)
     {
         // Parse RESULTS opcode
-        $kind = self::pop_int($body);
+        $bodyOffset = 0;
+        $kind = self::pop_int($body, $bodyOffset);
 
         switch ($kind)
         {
             case self::RESULT_KIND_VOID:
                 return array(array('result' => 'success'));
             case self::RESULT_KIND_ROWS:
-                return self::parse_rows($body);
+                return self::parse_rows($body, $bodyOffset);
             case self::RESULT_KIND_SET_KEYSPACE:
-                $keyspace = self::pop_string($body);
+                $keyspace = self::pop_string($body, $bodyOffset);
                 return array(array('keyspace' => $keyspace));
             case self::RESULT_KIND_PREPARED:
                 // <string id><metadata>
-                $id = base64_encode(self::pop_string($body));
-                $metadata = self::parse_rows_metadata($body);
+                $id = base64_encode(self::pop_string($body, $bodyOffset));
+                $metadata = self::parse_rows_metadata($body, $bodyOffset);
                 $columns = array();
 
                 foreach ($metadata as $column)
@@ -494,9 +495,9 @@ class Cassandra
                 return array('id' => $id, 'columns' => $columns);
             case self::RESULT_KIND_SCHEMA_CHANGE:
                 // <string change><string keyspace><string table>
-                $change = self::pop_string($body);
-                $keyspace = self::pop_string($body);
-                $table = self::pop_string($body);
+                $change = self::pop_string($body, $bodyOffset);
+                $keyspace = self::pop_string($body, $bodyOffset);
+                $table = self::pop_string($body, $bodyOffset);
                 return array(array('change' => $change, 'keyspace' => $keyspace,
                     'table' => $table));
         }
@@ -504,23 +505,25 @@ class Cassandra
     }
 
     /**
-     * Parses a RESULT Rows metadata (also used for RESULT Prepared).
+     * Parses a RESULT Rows metadata (also used for RESULT Prepared), starting
+     * from the offset, and advancing it in the process.
      *
-     * @param string $body Metadata body.
+     * @param string $body       Metadata body.
+     * @param string $bodyOffset Metadata body offset to start from.
      *
      * @return array Columns list
      * @access private
      */
-    private static function parse_rows_metadata(&$body)
+    private static function parse_rows_metadata($body, &$bodyOffset)
     {
-        $flags = self::pop_int($body);
-        $columns_count = self::pop_int($body);
+        $flags = self::pop_int($body, $bodyOffset);
+        $columns_count = self::pop_int($body, $bodyOffset);
 
         $global_table_spec = ($flags & 0x0001);
         if ($global_table_spec)
         {
-            $keyspace = self::pop_string($body);
-            $table = self::pop_string($body);
+            $keyspace = self::pop_string($body, $bodyOffset);
+            $table = self::pop_string($body, $bodyOffset);
         }
 
         $columns = array();
@@ -529,33 +532,33 @@ class Cassandra
         {
             if (!$global_table_spec)
             {
-                $keyspace = self::pop_string($body);
-                $table = self::pop_string($body);
+                $keyspace = self::pop_string($body, $bodyOffset);
+                $table = self::pop_string($body, $bodyOffset);
             }
 
-            $column_name = self::pop_string($body);
-            $column_type = self::pop_short($body);
+            $column_name = self::pop_string($body, $bodyOffset);
+            $column_type = self::pop_short($body, $bodyOffset);
             if ($column_type == self::COLUMNTYPE_CUSTOM)
             {
-                $column_type = self::pop_string($body);
+                $column_type = self::pop_string($body, $bodyOffset);
                 $column_subtype1 = 0;
                 $column_subtype2 = 0;
             } elseif (($column_type == self::COLUMNTYPE_LIST) ||
                 ($column_type == self::COLUMNTYPE_SET))
             {
-                $column_subtype1 = self::pop_short($body);
+                $column_subtype1 = self::pop_short($body, $bodyOffset);
                 if ($column_subtype1 == self::COLUMNTYPE_CUSTOM)
-                    $column_subtype1 = self::pop_string($body);
+                    $column_subtype1 = self::pop_string($body, $bodyOffset);
                 $column_subtype2 = 0;
             } elseif ($column_type == self::COLUMNTYPE_MAP)
             {
-                $column_subtype1 = self::pop_short($body);
+                $column_subtype1 = self::pop_short($body, $bodyOffset);
                 if ($column_subtype1 == self::COLUMNTYPE_CUSTOM)
-                    $column_subtype1 = self::pop_string($body);
+                    $column_subtype1 = self::pop_string($body, $bodyOffset);
 
-                $column_subtype2 = self::pop_short($body);
+                $column_subtype2 = self::pop_short($body, $bodyOffset);
                 if ($column_subtype2 == self::COLUMNTYPE_CUSTOM)
-                    $column_subtype2 = self::pop_string($body);
+                    $column_subtype2 = self::pop_string($body, $bodyOffset);
             } else
             {
                 $column_subtype1 = 0;
@@ -576,18 +579,19 @@ class Cassandra
     /**
      * Parses a RESULT Rows kind.
      *
-     * @param string Frame body to parse.
+     * @param string $body       Frame body to parse.
+     * @param string $bodyOffset Offset to start from.
      *
      * @return array Rows with associative array of the records.
      * @access private
      */
-    private static function parse_rows($body)
+    private static function parse_rows($body, $bodyOffset)
     {
         // <metadata><int count><rows_content>
-        $columns = self::parse_rows_metadata($body);
+        $columns = self::parse_rows_metadata($body, $bodyOffset);
         $columns_count = count($columns);
 
-        $rows_count = self::pop_int($body);
+        $rows_count = self::pop_int($body, $bodyOffset);
 
         $retval = array();
         for ($i=0;$i<$rows_count;$i++)
@@ -595,8 +599,7 @@ class Cassandra
             $row = array();
             foreach ($columns as $col)
             {
-                $content = self::pop_bytes($body);
-
+                $content = self::pop_bytes($body, $bodyOffset);
                 $value = self::unpack_value($content, $col['type'],
                     $col['subtype1'], $col['subtype2']);
 
@@ -1098,11 +1101,12 @@ class Cassandra
      */
     private static function unpack_list($content, $subtype)
     {
-        $itemsCount = self::pop_short($content);
+        $contentOffset = 0;
+        $itemsCount = self::pop_short($content, $contentOffset);
         $retval = array();
         for (;$itemsCount;$itemsCount--)
         {
-            $subcontent = self::pop_string($content);
+            $subcontent = self::pop_string($content, $contentOffset);
             $retval[] = self::unpack_value($subcontent, $subtype);
         }
 
@@ -1146,12 +1150,13 @@ class Cassandra
      */
     private static function unpack_map($content, $subtype1, $subtype2)
     {
-        $itemsCount = self::pop_short($content);
+        $contentOffset = 0;
+        $itemsCount = self::pop_short($content, $contentOffset);
         $retval = array();
         for (;$itemsCount;$itemsCount--)
         {
-            $subKeyRaw = self::pop_string($content);
-            $subValueRaw = self::pop_string($content);
+            $subKeyRaw = self::pop_string($content, $contentOffset);
+            $subValueRaw = self::pop_string($content, $contentOffset);
 
             $subKey = self::unpack_value($subKeyRaw, $subtype1);
             $subValue = self::unpack_value($subValueRaw, $subtype2);
@@ -1162,16 +1167,18 @@ class Cassandra
     }
 
     /**
-     * Pops a [bytes] value from the body, while removing the value from it.
+     * Pops a [bytes] value from the body, starting from the offset, and
+     * advancing it in the process.
      *
-     * @param string $body Content's body.
+     * @param string $body    Content's body.
+     * @param string &$offset Offset to start from.
      *
      * @return string Bytes content.
      * @access private
      */
-    private static function pop_bytes(&$body)
+    private static function pop_bytes($body, &$offset)
     {
-        $string_length = self::int_from_bin($body, 0, 4, 0);
+        $string_length = self::int_from_bin($body, $offset, 4, 0);
 
         if ($string_length == 0xFFFFFFFF)
         {
@@ -1180,61 +1187,67 @@ class Cassandra
         } else
         {
             $actual_length = $string_length;
-            $retval = substr($body, 4, $actual_length);
+            $retval = substr($body, $offset+4, $actual_length);
+            $offset += $actual_length+4;
         }
 
-        $body = substr($body, $actual_length+4);
         return $retval;
     }
 
     /**
-     * Pops a [string] value from the body, while removing the value from it.
+     * Pops a [string] value from the body, starting from the offset, and
+     * advancing it in the process.
      *
-     * @param string $body Content's body.
+     * @param string $body    Content's body.
+     * @param string &$offset Offset to start from.
      *
      * @return string String content.
      * @access private
      */
-    private static function pop_string(&$body)
+    private static function pop_string($body, &$offset)
     {
-        $string_length = unpack('n', $body);
+        $string_length = unpack('n', substr($body, $offset, 2));
         if ($string_length[1] == 0xFFFF)
         {
-            $body = substr($body, 2);
+            $offset += 2;
             return NULL;
         }
-        $retval = substr($body, 2, $string_length[1]);
-        $body = substr($body, $string_length[1]+2);
+        $retval = substr($body, $offset+2, $string_length[1]);
+        $offset += $string_length[1]+2;
         return $retval;
     }
 
     /**
-     * Pops an [int] value from the body, while removing the value from it.
+     * Pops a [int] value from the body, starting from the offset, and
+     * advancing it in the process.
      *
-     * @param string $body Content's body.
+     * @param string $body    Content's body.
+     * @param string &$offset Offset to start from.
      *
      * @return int Int content.
      * @access private
      */
-    private static function pop_int(&$body)
+    private static function pop_int($body, &$offset)
     {
-        $retval = self::int_from_bin($body, 0, 4, 1);
-        $body = substr($body, 4);
+        $retval = self::int_from_bin($body, $offset, 4, 1);
+        $offset += 4;
         return $retval;
     }
 
     /**
-     * Pops an [short] value from the body, while removing the value from it.
+     * Pops a [short] value from the body, starting from the offset, and
+     * advancing it in the process.
      *
-     * @param string $body Content's body.
+     * @param string $body    Content's body.
+     * @param string &$offset Offset to start from.
      *
      * @return short Short content.
      * @access private
      */
-    private static function pop_short(&$body)
+    private static function pop_short($body, &$offset)
     {
-        $retval = self::int_from_bin($body, 0, 2, 1);
-        $body = substr($body, 2);
+        $retval = self::int_from_bin($body, $offset, 2, 1);
+        $offset += 2;
         return $retval;
     }
 
