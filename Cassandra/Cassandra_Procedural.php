@@ -43,8 +43,8 @@ function cassandra_close($obj)
  * @param string $cql         The query to run.
  * @param int    $consistency Consistency level for the operation.
  *
- * @return array Result of the query. Might be array of rows (for SELECT),
- *               or operation's result (for USE, CREATE, ALTER, UPDATE).
+ * @return array Result of the query. Might be an array of rows (for SELECT),
+ *               or the operation's result (for USE, CREATE, ALTER, UPDATE).
  *               NULL on error.
  */
 function cassandra_query($obj, $cql, $consistency = CASSANDRA_CONSISTENCY_ALL)
@@ -76,8 +76,9 @@ function cassandra_prepare($obj, $cql)
  *                            the column's name.
  * @param int    $consistency Consistency level for the operation.
  *
- * @return array Result of the execution. Might be array of rows (for SELECT),
- *               or operation's result (for USE, CREATE, ALTER, UPDATE).
+ * @return array Result of the execution. Might be an array of rows (for
+ *               SELECT), or the operation's result (for USE, CREATE, ALTER,
+ *               UPDATE).
  *               NULL on error.
  */
 function cassandra_execute($obj, $stmt, $values, $consistency = CASSANDRA_CONSISTENCY_ALL)

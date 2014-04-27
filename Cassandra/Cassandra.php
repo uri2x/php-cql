@@ -253,8 +253,9 @@ class Cassandra
      * @param string $cql         The query to run.
      * @param int    $consistency Consistency level for the operation.
      *
-     * @return array Result of the query. Might be array of rows (for SELECT),
-     *               or operation's result (for USE, CREATE, ALTER, UPDATE).
+     * @return array Result of the query. Might be an array of rows (for
+     *               SELECT), or the operation's result (for USE, CREATE,
+     *               ALTER, UPDATE).
      *               NULL on error.
      * @access public
      */
@@ -295,8 +296,9 @@ class Cassandra
      *                           the column's name.
      * @param int   $consistency Consistency level for the operation.
      *
-     * @return array Result of the execution. Might be array of rows (for SELECT),
-     *               or operation's result (for USE, CREATE, ALTER, UPDATE).
+     * @return array Result of the execution. Might be an array of rows (for
+     *               SELECT), or the operation's result (for USE, CREATE,
+     *               ALTER, UPDATE).
      *               NULL on error.
      * @access public
      */
@@ -327,8 +329,9 @@ class Cassandra
      * @param int    $opcode Frame's opcode.
      * @param string $body   Frame's body.
      *
-     * @return array Result of the request. Might be array of rows (for SELECT),
-     *               or operation's result (for USE, CREATE, ALTER, UPDATE).
+     * @return array Result of the request. Might be an array of rows (for
+     *               SELECT), or the operation's result (for USE, CREATE,
+     *               ALTER, UPDATE).
      *               NULL on error.
      * @access private
      */
@@ -457,8 +460,9 @@ class Cassandra
      *
      * @param string $body Frame's body
      *
-     * @return array Result of the request. Might be array of rows (for SELECT),
-     *               or operation's result (for USE, CREATE, ALTER, UPDATE).
+     * @return array Parsed frame. Might be an array of rows (for SELECT),
+     *               or the operation's result (for USE, CREATE, ALTER,
+     *               UPDATE).
      *               NULL on error.
      * @access private
      */
