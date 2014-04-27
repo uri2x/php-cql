@@ -112,10 +112,10 @@ Sample usage :
 ```php
 $obj = new Cassandra();
 
-// Connect to the node:
+// Connects to the node:
 $res = $obj->connect('127.0.0.1', 'my_user', 'my_pass', 'my_keyspace');
 
-// Test if connection was successful:
+// Tests if the connection was successful:
 if ($res)
 {
     // Queries a table:
@@ -140,10 +140,10 @@ if ($res)
     //
     // )
 
-    // Prepare a statement:
+    // Prepares a statement:
     $stmt = $obj->prepare('UPDATE my_table SET col2=?,col3=? where col1=?');
 
-    // Execute a prepared statement:
+    // Executes a prepared statement:
     $values = array('col2' => 5, 'col3' => '0x55', 'col1' => 'five');
     $pResult = $obj->execute($stmt, $values);
 
@@ -163,20 +163,20 @@ if ($res)
 ```
 or, same as above in procedural style:
 ```php
-// Connect to the node:
+// Connects to the node:
 $handle = cassandra_connect('127.0.0.1', 'my_user', 'my_pass', 'my_keyspace');
 
-// Test if connection was successful:
+// Tests if the connection was successful:
 if ($handle)
 {
     // Queries a table:
     $arr = cassandra_query($handle, 'SELECT col1, col2, col3 FROM my_table');
 
-    // Prepare a statement:
+    // Prepares a statement:
     $stmt = cassandra_prepare($handle,
         'UPDATE my_table SET col2=?,col3=? where col1=?');
 
-    // Execute a prepared statement:
+    // Executes a prepared statement:
     $values = array('col2' => 5, 'col3' => '0x55', 'col1' => 'five');
     $pResult = cassandra_execute($handle, $stmt, $values);
 
