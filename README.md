@@ -1,11 +1,11 @@
 Documentation for class Cassandra
 ===================================
-Last update : 2014/04/27
+Last update : 2014/04/29
 
 Overview :
 ----------
 
-Native Cassandra connector for PHP based on the CQL binary protocol (v1),
+A native Apache Cassandra connector for PHP based on the CQL binary protocol (v1),
 without the need for an external extension.
 
 Requires PHP version 5, and Cassandra >1.2.

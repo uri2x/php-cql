@@ -37,7 +37,7 @@
  * @author    Uri Hartmann
  * @copyright 2014 Uri Hartmann
  * @license   http://opensource.org/licenses/MIT The MIT License (MIT)
- * @version   2014.04.26
+ * @version   2014.04.29
  * @link      http://www.humancodes.org/projects/php-cassandra
  */
 
@@ -131,7 +131,10 @@ class Cassandra
 
         $this->socket = 0;
 
-        if (!preg_match('/^\d+\.\d+\.\d+\.\d+$/', $host))
+        $hostIsIP = filter_var($host, FILTER_VALIDATE_IP,
+            FILTER_FLAG_IPV4 | FILTER_FLAG_IPV6);
+
+        if (!$hostIsIP)
         {
             if (($ip = @gethostbyname($host)) === false)
             {
@@ -144,8 +147,11 @@ class Cassandra
             $ip = $host;
         }
 
+        $isIPV6 = filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6);
+        $domain = ($isIPV6 ? AF_INET6 : AF_INET);
+
         // Creates socket
-        $socket = @socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+        $socket = @socket_create($domain, SOCK_STREAM, SOL_TCP);
         if ($socket === false)
         {
             trigger_error('Socket creation failed: '.
