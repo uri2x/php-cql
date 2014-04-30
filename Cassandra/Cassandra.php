@@ -450,7 +450,8 @@ class Cassandra
         {
             // ERROR: <int code><string msg>
             $errCode = self::int_from_bin($body, 0, 4);
-            $errMsg = self::pop_string($body, 4);
+            $i_tmp_offset = 4;  // Must be passed by reference
+            $errMsg = self::pop_string($body, $i_tmp_offset);
 
             trigger_error('Error 0x'.sprintf('%04X', $errCode).
                 ' received from server: '.$errMsg);
@@ -672,7 +673,7 @@ class Cassandra
                 return self::pack_map($value, $subtype1, $subtype2);
         }
 
-        trigger_error('Unknown column type '.$coltype);
+        trigger_error('Unknown column type '.$type);
         return NULL;
     }
 
@@ -730,7 +731,7 @@ class Cassandra
                 return self::unpack_map($content, $subtype1, $subtype2);
         }
 
-        trigger_error('Unknown column type '.$coltype);
+        trigger_error('Unknown column type '.$type);
         return NULL;
     }
 
@@ -1019,8 +1020,8 @@ class Cassandra
         if ($value[1])
         {
             return substr($value[1], 0, 8).'-'.substr($value[1], 8, 4).'-'.
-                substr($value[1], 12, 4).'-'.substr($value[1], 16, 4).'-'.
-                substr($value[1], 20);
+            substr($value[1], 12, 4).'-'.substr($value[1], 16, 4).'-'.
+            substr($value[1], 20);
         }
 
         return NULL;
