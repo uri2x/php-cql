@@ -450,8 +450,8 @@ class Cassandra
         {
             // ERROR: <int code><string msg>
             $errCode = self::int_from_bin($body, 0, 4);
-            $i_tmp_offset = 4;  // Must be passed by reference
-            $errMsg = self::pop_string($body, $i_tmp_offset);
+            $bodyOffset = 4;  // Must be passed by reference
+            $errMsg = self::pop_string($body, $bodyOffset);
 
             trigger_error('Error 0x'.sprintf('%04X', $errCode).
                 ' received from server: '.$errMsg);
