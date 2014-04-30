@@ -1020,8 +1020,8 @@ class Cassandra
         if ($value[1])
         {
             return substr($value[1], 0, 8).'-'.substr($value[1], 8, 4).'-'.
-            substr($value[1], 12, 4).'-'.substr($value[1], 16, 4).'-'.
-            substr($value[1], 20);
+                   substr($value[1], 12, 4).'-'.substr($value[1], 16, 4).'-'.
+                   substr($value[1], 20);
         }
 
         return NULL;
