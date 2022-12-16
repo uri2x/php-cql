@@ -1,0 +1,16 @@
+{
+    "name": "uri2x/php-cassandra",
+    "description": "A native Apache Cassandra connector for PHP based on the CQL binary protocol",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Uri2x\\PhpCassandra\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Uri Hartmann",
+            "homepage": "http://www.humancodes.org/projects/php-cassandra"
+        }
+    ]
+}

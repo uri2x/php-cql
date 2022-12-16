@@ -1,11 +1,11 @@
 Documentation for class Cassandra
 ===================================
-Last update : 2014/04/29
+Last update : 2022/12/19
 
 Overview :
 ----------
 
-A native Apache Cassandra connector for PHP based on the CQL binary protocol (v1),
+A native Apache Cassandra connector for PHP based on the CQL binary protocol (v3),
 without the need for an external extension.
 
 Requires PHP version 5, and Cassandra >1.2.
@@ -28,7 +28,7 @@ connect($host, $user = '', $passwd = '', $dbname = '', $port = 9042)
 
     Connects to a Cassandra node.
 
-    @param string $host   Host name/IP to connect to.
+    @param string $host   Host name/IP to connect to use 'p:' as prefix for persistent connections.
     @param string $user   Username in case authentication is needed.
     @param string $passwd Password in case authentication is needed.
     @param string $dbname Keyspace to use upon connection.
@@ -193,7 +193,7 @@ External links :
 http://www.datastax.com/dev/blog/binary-protocol
 
 2. CQL definitions
-https://github.com/apache/cassandra/blob/trunk/doc/native_protocol_v1.spec
+https://cassandra.apache.org/_/native_protocol.html
 
 
 License :
@@ -201,7 +201,7 @@ License :
 
 The MIT License (MIT)
 
-Copyright (c) 2014 Uri Hartmann
+Copyright (c) 2022 Uri Hartmann
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the "Software"),
