@@ -9,7 +9,7 @@ namespace CassandraNative;
 /**
  * Cassanda Connector
  *
- * A native Cassandra connector for PHP based on the CQL binary protocol v1,
+ * A native Cassandra connector for PHP based on the CQL binary protocol v3,
  * without the need for any external extensions.
  *
  * Requires PHP version 5, and Cassandra >1.2.
