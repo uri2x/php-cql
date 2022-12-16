@@ -1,16 +1,16 @@
 {
-    "name": "uri2x/php-cassandra",
-    "description": "A native Apache Cassandra connector for PHP based on the CQL binary protocol",
+    "name": "uri2x/php-cql",
+    "description": "A native Apache Cassandra and ScyllaDB connector for PHP based on the CQL binary protocol with support for persistent connections",
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Uri2x\\PhpCassandra\\": "src/"
+            "Uri2x\\PhpCql\\": "src/"
         }
     },
     "authors": [
         {
             "name": "Uri Hartmann",
-            "homepage": "http://www.humancodes.org/projects/php-cassandra"
+            "homepage": "http://www.humancodes.org/projects/php-cql"
         }
     ]
 }

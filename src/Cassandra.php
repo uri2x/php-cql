@@ -44,7 +44,7 @@ namespace CassandraNative;
  * @copyright 2022 Uri Hartmann
  * @license   http://opensource.org/licenses/MIT The MIT License (MIT)
  * @version   2022.12.16
- * @link      https://www.humancodes.org/projects/php-cassandra
+ * @link      https://www.humancodes.org/projects/php-cql
  */
 
 class BatchStatement
