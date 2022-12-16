@@ -3,9 +3,9 @@
     "description": "A native Apache Cassandra and ScyllaDB connector for PHP based on the CQL binary protocol with support for persistent connections",
     "license": "MIT",
     "autoload": {
-        "psr-4": [
+        "psr-4": {
             "CassandraNative\\": "src/"
-        ]
+        }
     },
     "authors": [
         {
