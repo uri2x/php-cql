@@ -1,28 +1,38 @@
-Documentation for class Cassandra
-===================================
+# uri2x/php-cql
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 Last update : 2022/12/16
 
-Overview :
-----------
-
-A native Apache Cassandra and ScyllaDB connector for PHP based on the CQL binary protocol (v3),
+A native [Apache Cassandra](https://cassandra.apache.org) and [ScyllaDB](https://www.scylladb.com) connector for PHP based on the CQL binary protocol (v3),
 without the need for an external extension.
 
-Requires PHP version >5, Cassandra >1.2, and any ScyllaDB version.
+Requires [PHP](https://www.php.net/) version >5, Cassandra >1.2, and any ScyllaDB version.
 
-Important :
------------
+Installation
+------------
+
+Either:
+
+* Via [Composer](https://getcomposer.org/):
+```bash
+$ composer require uri2x/php-cql
+```
+OR
+
+* Copy `Cassandra.php` to your project and include it.
+
+Important
+---------
 
 Make sure you turn on the native transport for Cassandra by editing your
-cassandra.yaml file and adding the following line (see External link 1):
+cassandra.yaml file and adding the following line:
 
-start_native_transport: true
+    start_native_transport: true
 
+Usage
+-----
 
-Usage :
--------
-
-Available methods:
+#### Available methods
 
 connect($host, $user = '', $passwd = '', $dbname = '', $port = 9042)
 
@@ -33,6 +43,7 @@ connect($host, $user = '', $passwd = '', $dbname = '', $port = 9042)
     @param string $passwd Password in case authentication is needed.
     @param string $dbname Keyspace to use upon connection.
     @param int    $port   Port to connect to.
+    @param int    $retries: Number of connection retries (default: 3, useful for persistent connections in case of timeouts).
 
     @return int The socket descriptor used. FALSE if unable to connect.
 
@@ -77,10 +88,10 @@ execute($stmt, $values, $consistency = CASSANDRA_CONSISTENCY_ALL)
                   SELECT), or the operation's result (for USE, CREATE, ALTER,
                   UPDATE).
                   NULL on error.
-
+#### Procedural
 In addition, a wrapper has been made for those who prefer to work with
 procedural programming. To use the wrapper, make sure to include
-Cassandra_Procedural.php that contains the following methods:
+`Cassandra_Procedural.php` that contains the following methods:
 
 cassandra_connect($host, $user = '', $passwd = '', $dbname = '', $port = 9042)
 
@@ -108,10 +119,15 @@ cassandra_execute($obj, $stmt, $values, $consistency = CASSANDRA_CONSISTENCY_ALL
     first parameter.
 
 
-Sample usage :
----------------
+Sample usage
+------------
 ```php
-$obj = new Cassandra();
+
+<?php
+
+require_once('vendor/autoload.php');
+
+$obj = new CassandraNative\Cassandra();
 
 // Connects to the node:
 $res = $obj->connect('127.0.0.1', 'my_user', 'my_pass', 'my_keyspace');
@@ -186,8 +202,8 @@ if ($handle)
 }
 ```
 
-External links :
-----------------
+External links
+--------------
 
 1. Datastax's blog introducing the binary protocol:
 http://www.datastax.com/dev/blog/binary-protocol
@@ -196,27 +212,27 @@ http://www.datastax.com/dev/blog/binary-protocol
 https://cassandra.apache.org/_/native_protocol.html
 
 
-License :
----------
+License
+-------
 
-The MIT License (MIT)
+    The MIT License (MIT)
 
-Copyright (c) 2022 Uri Hartmann
+    Copyright (c) 2022 Uri Hartmann
 
-Permission is hereby granted, free of charge, to any person obtaining a
-copy of this software and associated documentation files (the "Software"),
-to deal in the Software without restriction, including without limitation
-the rights to use, copy, modify, merge, publish, distribute, sublicense,
-and/or sell copies of the Software, and to permit persons to whom the
-Software is furnished to do so, subject to the following conditions:
+    Permission is hereby granted, free of charge, to any person obtaining a
+    copy of this software and associated documentation files (the "Software"),
+    to deal in the Software without restriction, including without limitation
+    the rights to use, copy, modify, merge, publish, distribute, sublicense,
+    and/or sell copies of the Software, and to permit persons to whom the
+    Software is furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
+    The above copyright notice and this permission notice shall be included in
+    all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-DEALINGS IN THE SOFTWARE.
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+    DEALINGS IN THE SOFTWARE.

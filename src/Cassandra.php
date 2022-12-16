@@ -297,11 +297,12 @@ class Cassandra
     /**
      * Connects to a Cassandra node.
      *
-     * @param string $host   Host name/IP to connect to use 'p:' as prefix for persistent connections.
-     * @param string $user   Username in case authentication is needed.
-     * @param string $passwd Password in case authentication is needed.
-     * @param string $dbname Keyspace to use upon connection.
-     * @param int    $port   Port to connect to.
+     * @param string $host    Host name/IP to connect to use 'p:' as prefix for persistent connections.
+     * @param string $user    Username in case authentication is needed.
+     * @param string $passwd  Password in case authentication is needed.
+     * @param string $dbname  Keyspace to use upon connection.
+     * @param int    $port    Destination port (default: 9042).
+     * @param int    $retries Number of connection retries (default: 3, useful for persistent connections in case of timeouts).
      *
      * @return int The socket descriptor used. FALSE if unable to connect.
      * @access public
