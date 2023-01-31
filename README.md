@@ -1,7 +1,7 @@
 # uri2x/php-cql
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Last update : 2022/12/16
+Last update : 2023/01/31
 
 Native [Apache Cassandra](https://cassandra.apache.org) and [ScyllaDB](https://www.scylladb.com) connector for PHP based on the CQL binary protocol (v3),
 without the need for an external extension.
@@ -217,7 +217,7 @@ License
 
     The MIT License (MIT)
 
-    Copyright (c) 2022 Uri Hartmann
+    Copyright (c) 2023 Uri Hartmann
 
     Permission is hereby granted, free of charge, to any person obtaining a
     copy of this software and associated documentation files (the "Software"),
