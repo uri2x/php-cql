@@ -12,13 +12,13 @@ namespace CassandraNative;
  * A native Cassandra connector for PHP based on the CQL binary protocol v3,
  * without the need for any external extensions.
  *
- * Requires PHP version 5, and Cassandra >1.2.
+ * Requires PHP version >5, and Cassandra >1.2.
  *
  * Usage and more information is found on docs/Cassandra.txt
  *
  * The MIT License (MIT)
  *
- * Copyright (c) 2022 Uri Hartmann
+ * Copyright (c) 2023 Uri Hartmann
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -43,7 +43,7 @@ namespace CassandraNative;
  * @author    Uri Hartmann
  * @copyright 2022 Uri Hartmann
  * @license   http://opensource.org/licenses/MIT The MIT License (MIT)
- * @version   2022.12.16
+ * @version   2023.01.31
  * @link      https://www.humancodes.org/projects/php-cql
  */
 
@@ -176,6 +176,10 @@ class Cassandra
     public $async_requests = 0;
     private int $timeout_connect = 2;
     private int $timeout_read = 120;
+    private string $host = '';
+    private bool $persistent = false;
+    private string $fullFrame = '';
+    private array $warnings = [];
 
     public function __construct()
     {

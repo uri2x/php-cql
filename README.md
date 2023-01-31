@@ -3,7 +3,7 @@
 
 Last update : 2022/12/16
 
-A native [Apache Cassandra](https://cassandra.apache.org) and [ScyllaDB](https://www.scylladb.com) connector for PHP based on the CQL binary protocol (v3),
+Native [Apache Cassandra](https://cassandra.apache.org) and [ScyllaDB](https://www.scylladb.com) connector for PHP based on the CQL binary protocol (v3),
 without the need for an external extension.
 
 Requires [PHP](https://www.php.net/) version >5, Cassandra >1.2, and any ScyllaDB version.
