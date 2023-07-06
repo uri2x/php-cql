@@ -1,7 +1,7 @@
 # uri2x/php-cql
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Last update : 2023/01/31
+Last update : 2023/07/06
 
 Native [Apache Cassandra](https://cassandra.apache.org) and [ScyllaDB](https://www.scylladb.com) connector for PHP based on the CQL binary protocol (v3),
 without the need for an external extension.
