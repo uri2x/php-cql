@@ -216,9 +216,6 @@ class Cassandra
         if ($this->persistent)
             $host = substr($host, 2);
 
-        $isIPV6 = filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6);
-        $domain = ($isIPV6 ? AF_INET6 : AF_INET);
-
         // Connects to server
         if ($this->persistent)
             $connection = @pfsockopen($host, $port, $errno, $errstr, $this->timeout_connect);
@@ -368,6 +365,11 @@ class Cassandra
         if ($this->async_requests) {
             throw new \Exception('Cannot query while async requests are pending. Call read_async() first');
             return NULL;
+        }
+
+        if (!$this->socket) {
+          throw new  \Exception('Not connected');
+          return NULL;
         }
 
         // Prepares the frame's body
@@ -560,10 +562,11 @@ class Cassandra
         $frame = $this->pack_frame($opcode, $body, $response, $stream);
 
         // Writes frame to socket
-        if (@fwrite($this->socket, $frame) === false) {
+        try {
+            fwrite($this->socket, $frame);
+        } catch (Exception $e) {
             $this->close(true);
-            throw new \Exception('Socket write failed');
-            return false;
+            throw $e;
         }
 
         return true;
