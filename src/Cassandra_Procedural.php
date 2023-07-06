@@ -5,6 +5,7 @@
  */
 
 require_once('Cassandra.php');
+use \CassandraNative\Cassandra as Cassandra;
 
 /**
  * Connects to a Cassandra node.
@@ -47,7 +48,7 @@ function cassandra_close($obj)
  *               or the operation's result (for USE, CREATE, ALTER, UPDATE).
  *               NULL on error.
  */
-function cassandra_query($obj, $cql, $consistency = CASSANDRA_CONSISTENCY_ALL)
+function cassandra_query($obj, $cql, $consistency = Cassandra::CONSISTENCY_ALL)
 {
     return $obj->query($cql, $consistency);
 }
@@ -81,7 +82,7 @@ function cassandra_prepare($obj, $cql)
  *               UPDATE).
  *               NULL on error.
  */
-function cassandra_execute($obj, $stmt, $values, $consistency = CASSANDRA_CONSISTENCY_ALL)
+function cassandra_execute($obj, $stmt, $values, $consistency = Cassandra::CONSISTENCY_ALL)
 {
     return $obj->execute($stmt, $values, $consistency);
 }
