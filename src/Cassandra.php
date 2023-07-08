@@ -353,6 +353,8 @@ class Cassandra
      *
      * @param string $cql         The query to run.
      * @param int    $consistency Consistency level for the operation.
+     * @param array  $values      Values to bind in a sequential or key=>value format,
+     *                            where key is the column's name.
      *
      * @return array Result of the query. Might be an array of rows (for
      *               SELECT), or the operation's result (for USE, CREATE,
@@ -360,7 +362,7 @@ class Cassandra
      *               NULL on error.
      * @access public
      */
-    public function query($cql, $consistency = self::CONSISTENCY_ALL)
+    public function query($cql, $consistency = self::CONSISTENCY_ALL, $values = [])
     {
         if ($this->async_requests) {
             throw new \Exception('Cannot query while async requests are pending. Call read_async() first');
@@ -368,15 +370,33 @@ class Cassandra
         }
 
         if (!$this->socket) {
-          throw new  \Exception('Not connected');
-          return NULL;
+            throw new  \Exception('Not connected');
+            return NULL;
         }
 
         // Prepares the frame's body
         // TODO: Support the new <flags> byte
-        $frame = $this->pack_long_string($cql) .
-            $this->pack_short($consistency) .
-            $this->pack_byte(0);
+        $frame = $this->pack_long_string($cql) . $this->pack_short($consistency);
+        if (count($values)) {
+            $values_data = '';
+            $namedParameters = false;
+            foreach ($values as $key => $value) {
+                $namedParameters = $namedParameters || is_string($key);
+
+                if ($namedParameters)
+                    $values_data .= $this->pack_string($key);
+
+                $data = $this->pack_value($value, $this->type_from_value($value), 0, 0);
+
+                $values_data .= $this->pack_long_string($data);
+            }
+
+            $frame .= $this->pack_byte(0x01 | ($namedParameters ? 0x40 : 0x00)) .
+                $this->pack_short(count($values)) .
+                $values_data;
+        } else {
+            $frame .= $this->pack_byte(0x00);
+        }
 
         // Writes a QUERY frame and return the result
         return $this->request_result(self::OPCODE_QUERY, $frame);
@@ -827,6 +847,25 @@ class Cassandra
         }
 
         return $retval;
+    }
+
+    /**
+     * Lookup a value's Cassandra type for use with the QUERY parameters
+     *
+     * @param mixed $value Value to test.
+     * @return int  $type  Column type.
+     *
+     * @access private
+     */
+    private function type_from_value($value)
+    {
+        if (is_int($value))
+            return self::COLUMNTYPE_INT;
+
+        if (is_float($value))
+            return self::COLUMNTYPE_DOUBLE;
+
+        return self::COLUMNTYPE_VARCHAR;
     }
 
     /**

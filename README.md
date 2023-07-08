@@ -53,12 +53,14 @@ close()
 
     @return int 1
 
-query($cql, $consistency = CASSANDRA_CONSISTENCY_ALL)
+query($cql, $consistency = CASSANDRA_CONSISTENCY_ALL, $values = [])
 
     Queries the database using the given CQL.
 
     @param string $cql         The query to run.
     @param int    $consistency Consistency level for the operation.
+    @param array  $values      Values to bind in a sequential or key=>value format,
+                               where key is the column's name.
 
     @return array Result of the query. Might be an array of rows (for SELECT),
                   or the operation's result (for USE, CREATE, ALTER, UPDATE).
