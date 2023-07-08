@@ -119,6 +119,7 @@ cassandra_query($obj, $cql, $consistency = CASSANDRA_CONSISTENCY_ALL, $values = 
     first parameter.
 
  cassandra_bind_param($value, $column_type)
+
     Same as $Cassandra->bind_param() above
 
 cassandra_prepare($obj, $cql)
