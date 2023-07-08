@@ -14,7 +14,7 @@ namespace CassandraNative;
  *
  * Requires PHP version >5, and Cassandra >1.2.
  *
- * Usage and more information is found on docs/Cassandra.txt
+ * Usage and more information is found on README.md
  *
  * The MIT License (MIT)
  *
@@ -41,9 +41,9 @@ namespace CassandraNative;
  * @category  Database
  * @package   Cassandra
  * @author    Uri Hartmann
- * @copyright 2022 Uri Hartmann
+ * @copyright 2023 Uri Hartmann
  * @license   http://opensource.org/licenses/MIT The MIT License (MIT)
- * @version   2023.01.31
+ * @version   2023.07.08
  * @link      https://www.humancodes.org/projects/php-cql
  */
 
@@ -386,7 +386,7 @@ class Cassandra
                 if ($namedParameters)
                     $values_data .= $this->pack_string($key);
 
-                $data = $this->pack_value($value, $this->type_from_value($value), 0, 0);
+                $data = $this->pack_value($value[0], $value[1], 0, 0);
 
                 $values_data .= $this->pack_long_string($data);
             }
@@ -400,6 +400,22 @@ class Cassandra
 
         // Writes a QUERY frame and return the result
         return $this->request_result(self::OPCODE_QUERY, $frame);
+    }
+
+    /**
+     * Returns a binded parameter to be used with the query method
+     *
+     * @param mixed $value Value to bind        The query to run.
+     * @param int   $type  Value type out of one of the Cassandra::COLUMNTYPE_* constants
+     *
+     * @return array value to be used as part of the $values parameter of the query method
+     *
+     * @access public
+     * @static
+     */
+    public static function bind_param($value, $column_type)
+    {
+        return [$value, $column_type];
     }
 
     /**
@@ -847,25 +863,6 @@ class Cassandra
         }
 
         return $retval;
-    }
-
-    /**
-     * Lookup a value's Cassandra type for use with the QUERY parameters
-     *
-     * @param mixed $value Value to test.
-     * @return int  $type  Column type.
-     *
-     * @access private
-     */
-    private function type_from_value($value)
-    {
-        if (is_int($value))
-            return self::COLUMNTYPE_INT;
-
-        if (is_float($value))
-            return self::COLUMNTYPE_DOUBLE;
-
-        return self::COLUMNTYPE_VARCHAR;
     }
 
     /**

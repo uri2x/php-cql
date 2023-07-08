@@ -1,7 +1,7 @@
 # uri2x/php-cql
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Last update : 2023/07/06
+Last update : 2023/07/08
 
 Native [Apache Cassandra](https://cassandra.apache.org) and [ScyllaDB](https://www.scylladb.com) connector for PHP based on the CQL binary protocol (v3),
 without the need for an external extension.
@@ -66,6 +66,14 @@ query($cql, $consistency = CASSANDRA_CONSISTENCY_ALL, $values = [])
                   or the operation's result (for USE, CREATE, ALTER, UPDATE).
                   NULL on error.
 
+bind_param($value, $column_type)
+     Returns a binded parameter to be used with the query method (static method)
+
+     @param mixed $value Value to bind        The query to run.
+     @param int   $type  Value type out of one of the Cassandra::COLUMNTYPE_* constants
+
+     @return array value to be used as part of the $values parameter of the query method
+
 prepare($cql)
 
     Prepares a query.
@@ -105,10 +113,13 @@ cassandra_close($obj)
     Same as $Cassandra->close() above. Use $obj from cassandra_connect as the
     first parameter.
 
-cassandra_query($obj, $cql, $consistency = CASSANDRA_CONSISTENCY_ALL)
+cassandra_query($obj, $cql, $consistency = CASSANDRA_CONSISTENCY_ALL, $values = [])
 
     Same as $Cassandra->query() above. Use $obj from cassandra_connect as the
     first parameter.
+
+ cassandra_bind_param($value, $column_type)
+    Same as $Cassandra->bind_param() above
 
 cassandra_prepare($obj, $cql)
 
@@ -129,7 +140,9 @@ Sample usage
 
 require_once('vendor/autoload.php');
 
-$obj = new CassandraNative\Cassandra();
+use CassandraNative\Cassandra;
+
+$obj = new Cassandra();
 
 // Connects to the node:
 $res = $obj->connect('127.0.0.1', 'my_user', 'my_pass', 'my_keyspace');
@@ -138,9 +151,11 @@ $res = $obj->connect('127.0.0.1', 'my_user', 'my_pass', 'my_keyspace');
 if ($res)
 {
     // Queries a table:
-    $arr = $obj->query('SELECT col1, col2, col3 FROM my_table');
+    $arr = $obj->query('SELECT col1, col2, col3 FROM my_table WHERE id=?',
+      Cassandra::CONSISTENCY_ONE,
+      [Cassandra::bind_param(1001, Cassandra::COLUMNTYPE_BIGINT]);
 
-    // $arr, for example, can contain:
+    // $arr, for example, may contain:
     // Array
     // (
     //     [0] => Array

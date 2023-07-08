@@ -5,6 +5,7 @@
  */
 
 require_once('Cassandra.php');
+
 use \CassandraNative\Cassandra as Cassandra;
 
 /**
@@ -43,14 +44,29 @@ function cassandra_close($obj)
  * @param object $obj         The object returned by cassandra_connect().
  * @param string $cql         The query to run.
  * @param int    $consistency Consistency level for the operation.
+ * @param array  $values      Values to bind in a sequential or key=>value format,
+ *                            where key is the column's name.
  *
  * @return array Result of the query. Might be an array of rows (for SELECT),
  *               or the operation's result (for USE, CREATE, ALTER, UPDATE).
  *               NULL on error.
  */
-function cassandra_query($obj, $cql, $consistency = Cassandra::CONSISTENCY_ALL)
+function cassandra_query($obj, $cql, $consistency = Cassandra::CONSISTENCY_ALL, $values = [])
 {
-    return $obj->query($cql, $consistency);
+    return $obj->query($cql, $consistency, $values);
+}
+
+/**
+ * Returns a binded parameter to be used with the query method
+ *
+ * @param mixed $value Value to bind        The query to run.
+ * @param int   $type  Value type out of one of the Cassandra::COLUMNTYPE_* constants
+ *
+ * @return array value to be used as part of the $values parameter of the query method
+ */
+function cassandra_bind_param($value, $column_type)
+{
+    return Cassandra::bind_param($value, $column_type);
 }
 
 /**
